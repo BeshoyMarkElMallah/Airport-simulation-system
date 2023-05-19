@@ -44,8 +44,8 @@ waiting_time_in_quene=0
 grand_avg_waiting = 0  # average waiting time across all runs
 grand_max_qlen = 0  # maximum queue length across all runs
 
-lamdaIAT = eval(input("Enter the value of lambda for inter-arrival time: "))
-lamdaST =  eval(input("Enter the value of lambda for service time: "))
+LAMDAIAT = 0.2
+LAMDAST = 0.001
 
 # Run simulation NUM_OF_RUNS times
 for i in range(NUM_OF_RUNS):
@@ -54,8 +54,8 @@ for i in range(NUM_OF_RUNS):
     max_qlen = 0  # initialize maximum queue length for this run
     server_idle = 0  # initialize amount of time server is idle for this run
     c1 = Row()  # create first customer object
-    c1.iat = generate_random_numbers(lamdaIAT)  # generate random inter-arrival time
-    c1.st = generate_random_numbers(lamdaST)  # generate random service time
+    c1.iat = generate_random_numbers(LAMDAIAT)  # generate random inter-arrival time
+    c1.st = generate_random_numbers(LAMDAST)  # generate random service time
     c1.arrival = c1.iat  # set arrival time equal to inter-arrival time
     c1.sstart = c1.arrival  # set service start time equal to arrival time
     c1.send = c1.sstart+c1.st  # calculate service end time
@@ -67,8 +67,8 @@ for i in range(NUM_OF_RUNS):
     # Create remaining customer objects and calculate their simulation data
     for i in range(1,NUM_OF_CUSTOMERS):
         c = Row()  # create new customer object
-        c.iat = generate_random_numbers(lamdaIAT)  # generate random inter-arrival time
-        c.st = generate_random_numbers(lamdaST)  # generate random service time
+        c.iat = generate_random_numbers(LAMDAIAT)  # generate random inter-arrival time
+        c.st = generate_random_numbers(LAMDAST)  # generate random service time
         c.arrival = c.iat + sim_table[i-1].arrival  # calculate arrival time based on previous customer's arrival time
         if c.arrival >= sim_table[i-1].send:
             # if the customer arrives after the previous customer's service has finished,
