@@ -131,7 +131,8 @@ for i in range(NUM_OF_RUNS):
     print('average waiting time of those who wait:= ',avg_waiting_time_who_wait)
     print('average time a customer spends in system:= ',avg_cust_spend_in_system)
     print('\n\n')
-
+    sim_table.clear()  # clear simulation table for next run
+    
 
 grand_avg_waiting /= NUM_OF_RUNS    # calculate overall average waiting time across all runs
 
