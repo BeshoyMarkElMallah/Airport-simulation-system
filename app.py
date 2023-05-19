@@ -34,11 +34,18 @@ class Row:
 
 # Set initial values for variables and constants
 sim_table = []  # list to hold simulation data
-NUM_OF_CUSTOMERS = 500  # number of simulated customers
-NUM_OF_RUNS = 100 # number of times to run simulation
+NUM_OF_CUSTOMERS = 10  # number of simulated customers
+NUM_OF_RUNS = 10 # number of times to run simulation
+num_of_cust_waiting=0
+service_time=0
+time_between_arrivals=0
+waiting_time_in_quene=0
 
 grand_avg_waiting = 0  # average waiting time across all runs
 grand_max_qlen = 0  # maximum queue length across all runs
+
+lamdaIAT = eval(input("Enter the value of lambda for inter-arrival time: "))
+lamdaST =  eval(input("Enter the value of lambda for service time: "))
 
 # Run simulation NUM_OF_RUNS times
 for i in range(NUM_OF_RUNS):
@@ -47,8 +54,8 @@ for i in range(NUM_OF_RUNS):
     max_qlen = 0  # initialize maximum queue length for this run
     server_idle = 0  # initialize amount of time server is idle for this run
     c1 = Row()  # create first customer object
-    c1.iat = generate_random_numbers(0.2)  # generate random inter-arrival time
-    c1.st = generate_random_numbers(0.125)  # generate random service time
+    c1.iat = generate_random_numbers(lamdaIAT)  # generate random inter-arrival time
+    c1.st = generate_random_numbers(lamdaST)  # generate random service time
     c1.arrival = c1.iat  # set arrival time equal to inter-arrival time
     c1.sstart = c1.arrival  # set service start time equal to arrival time
     c1.send = c1.sstart+c1.st  # calculate service end time
@@ -60,8 +67,8 @@ for i in range(NUM_OF_RUNS):
     # Create remaining customer objects and calculate their simulation data
     for i in range(1,NUM_OF_CUSTOMERS):
         c = Row()  # create new customer object
-        c.iat = generate_random_numbers(0.2)  # generate random inter-arrival time
-        c.st = generate_random_numbers(0.125)  # generate random service time
+        c.iat = generate_random_numbers(lamdaIAT)  # generate random inter-arrival time
+        c.st = generate_random_numbers(lamdaST)  # generate random service time
         c.arrival = c.iat + sim_table[i-1].arrival  # calculate arrival time based on previous customer's arrival time
         if c.arrival >= sim_table[i-1].send:
             # if the customer arrives after the previous customer's service has finished,
@@ -82,40 +89,52 @@ for i in range(NUM_OF_RUNS):
         
         c.send = c.sstart + c.st  # calculate service end time
         c.waiting = c.sstart - c.arrival  # calculate time spent waiting in queue
+        if(c.waiting>0):
+            num_of_cust_waiting +=1
+            waiting_time_in_quene+=c.waiting
         
         avg_waiting += c.waiting  # add waiting time for this customer to total
         max_qlen = max(c.qlen,max_qlen)  # update max queue length if necessary
         server_idle += c.idle  # add idle time for this customer to total
-        
+        sim_run_time=c.send
+        service_time+=c.st
+        time_between_arrivals +=c.iat
+
         sim_table.append(c)  # add customer object to simulation table
 
-        avg_waiting /= NUM_OF_CUSTOMERS  # calculate average waiting time for this run
-        # server_idle /= sim_table[NUM_OF_CUSTOMERS-1].send  # calculate server idle time for this run
+    avg_waiting /= NUM_OF_CUSTOMERS  # calculate average waiting time for this run
+   # server_idle /= sim_table[NUM_OF_CUSTOMERS-1].send  # calculate server idle time for this run
 
-        grand_avg_waiting += avg_waiting  # add average waiting time for this run to total for all runs
-        grand_max_qlen = max(max_qlen,grand_max_qlen)  # update max queue length across all runs if necessary
+    grand_avg_waiting += avg_waiting  # add average waiting time for this run to total for all runs
+    grand_max_qlen = max(max_qlen,grand_max_qlen)  # update max queue length across all runs if necessary
 
-    # grand_avg_waiting /= NUM_OF_RUNS  # calculate overall average waiting time across all runs
+    # calculate overall average waiting time across all runs
 
     # Print out simulation data table
-    
+    prob_that_cust_has_wait=num_of_cust_waiting/NUM_OF_CUSTOMERS #probability that customer has to wait 
+    prob_of_server_idleness=server_idle/sim_run_time #proportion of server idleness
+    avg_service_time = service_time/NUM_OF_CUSTOMERS #average srevice time
+    avg_time_bet_arrivals= time_between_arrivals / (NUM_OF_CUSTOMERS-1) #average time between arrivals
+    avg_waiting_time_who_wait= waiting_time_in_quene/num_of_cust_waiting #average waiting time of those who wait
+    avg_cust_spend_in_system = avg_waiting +avg_service_time #average time a customer spends in system
 
-grand_avg_waiting /= NUM_OF_RUNS
-c = 0
-print("cust\t\tiat\t\tst\t\tarrival\t\tsstart\t\tsend\t\twaiting\t\tqlen\t\tidle")
-for i in range(NUM_OF_CUSTOMERS*NUM_OF_RUNS):
-    if c == NUM_OF_CUSTOMERS:
-        print('\n\n')
-        c = 0
-    print("C"+str(c+1),'\t\t',sim_table[i].iat,'\t\t',sim_table[i].st,'\t\t',sim_table[i].arrival,'\t\t',sim_table[i].sstart,'\t\t',sim_table[i].send,'\t\t',sim_table[i].waiting,'\t\t',sim_table[i].qlen,'\t\t',sim_table[i].idle)
-    c+=1
-
-# Print out simulation results
-print('grand_avg_waiting:= ',grand_avg_waiting)
-print('grand_max_qlen:= ',grand_max_qlen)
-print('avg_waiting:= ',avg_waiting)
-print('max_qlen:= ',max_qlen)
-print('server_idle:= ',server_idle)
+    print("cust\t\tiat\t\tst\t\tarrival\t\tsstart\t\tsend\t\twaiting\t\tqlen\t\tidle")
+    for i in range(NUM_OF_CUSTOMERS):
+        print("C"+str(i+1),'\t\t',sim_table[i].iat,'\t\t',sim_table[i].st,'\t\t',sim_table[i].arrival,'\t\t',sim_table[i].sstart,'\t\t',sim_table[i].send,'\t\t',sim_table[i].waiting,'\t\t',sim_table[i].qlen,'\t\t',sim_table[i].idle)
+    print('avg_waiting:= ',avg_waiting)
+    print('max_qlen:= ',max_qlen)   
+    print('server_idle:= ',server_idle)
+    print('probability that customer has to wait:= ',prob_that_cust_has_wait) 
+    print('proportion of server idleness:= ',prob_of_server_idleness)
+    print('average srevice time:= ',avg_service_time)
+    print('average time between arrivals:= ',avg_time_bet_arrivals)
+    print('average waiting time of those who wait:= ',avg_waiting_time_who_wait)
+    print('average time a customer spends in system:= ',avg_cust_spend_in_system)
+    print('\n\n')
 
 
+grand_avg_waiting /= NUM_OF_RUNS    # calculate overall average waiting time across all runs
+
+print('grand_avg_waiting:= ',grand_avg_waiting) # print overall average waiting time across all runs
+print('grand_max_qlen:= ',grand_max_qlen) # print max queue length across all runs
 
