@@ -34,7 +34,7 @@ class Row:
 
 # Set initial values for variables and constants
 sim_table = []  # list to hold simulation data
-NUM_OF_CUSTOMERS = 10  # number of simulated customers
+NUM_OF_CUSTOMERS = 500  # number of simulated customers
 NUM_OF_RUNS = 10 # number of times to run simulation
 num_of_cust_waiting=0
 service_time=0
