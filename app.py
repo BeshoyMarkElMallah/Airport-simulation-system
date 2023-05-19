@@ -45,7 +45,7 @@ grand_avg_waiting = 0  # average waiting time across all runs
 grand_max_qlen = 0  # maximum queue length across all runs
 
 LAMDAIAT = 0.2
-LAMDAST = 0.001
+LAMDAST = 0.33
 
 # Run simulation NUM_OF_RUNS times
 for i in range(NUM_OF_RUNS):
