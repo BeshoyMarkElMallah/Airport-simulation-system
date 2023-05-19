@@ -4,16 +4,18 @@ import numpy as np
 
 # Set the value of lambda as an input (rate parameter)
 
-def generate_random_numbers(lam):
+def generate_exponential_number(lam):
     # Generate a random number between 0 and 1
     r = random.random()
     # Calculate the inter-arrival time
     x = -math.log(1 - r) / lam
     res = round(x)
-    # res = np.random.poisson(lam)
+    
     return res
 
-
+def generate_Poisson_number(lam):   
+    res = np.random.poisson(lam,size=500)
+    return res
 
 
 # Import necessary modules
@@ -44,8 +46,8 @@ waiting_time_in_quene=0
 grand_avg_waiting = 0  # average waiting time across all runs
 grand_max_qlen = 0  # maximum queue length across all runs
 
-LAMDAIAT = 0.2
-LAMDAST = 0.33
+LAMDAIAT = 5  # inter-arrival rate
+LAMDAST = 0.33 # service rate
 
 # Run simulation NUM_OF_RUNS times
 for i in range(NUM_OF_RUNS):
@@ -54,8 +56,8 @@ for i in range(NUM_OF_RUNS):
     max_qlen = 0  # initialize maximum queue length for this run
     server_idle = 0  # initialize amount of time server is idle for this run
     c1 = Row()  # create first customer object
-    c1.iat = generate_random_numbers(LAMDAIAT)  # generate random inter-arrival time
-    c1.st = generate_random_numbers(LAMDAST)  # generate random service time
+    c1.iat = generate_Poisson_number(LAMDAIAT)[0]  # generate random inter-arrival time
+    c1.st = generate_exponential_number(LAMDAST)  # generate random service time
     c1.arrival = c1.iat  # set arrival time equal to inter-arrival time
     c1.sstart = c1.arrival  # set service start time equal to arrival time
     c1.send = c1.sstart+c1.st  # calculate service end time
@@ -67,8 +69,8 @@ for i in range(NUM_OF_RUNS):
     # Create remaining customer objects and calculate their simulation data
     for i in range(1,NUM_OF_CUSTOMERS):
         c = Row()  # create new customer object
-        c.iat = generate_random_numbers(LAMDAIAT)  # generate random inter-arrival time
-        c.st = generate_random_numbers(LAMDAST)  # generate random service time
+        c.iat = generate_Poisson_number(LAMDAIAT)[i]  # generate random inter-arrival time
+        c.st = generate_exponential_number(LAMDAST)  # generate random service time
         c.arrival = c.iat + sim_table[i-1].arrival  # calculate arrival time based on previous customer's arrival time
         if c.arrival >= sim_table[i-1].send:
             # if the customer arrives after the previous customer's service has finished,
